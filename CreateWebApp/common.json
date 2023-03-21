@@ -1,0 +1,251 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "namePrefix": {
+            "defaultValue": "devtenxr",
+            "type": "string",
+            "metadata": {
+                "description": "Name prefix for resources"
+            }
+        },
+        "kvTenantId": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "kvUserId": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "newOrExistingKv": {
+            "type": "string",
+            "allowedValues": [
+                "new",
+                "existing"
+            ]
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {}
+        }
+    },
+    "variables": {
+        "namePrefix": "[concat(parameters('namePrefix'),'-csilab')]",
+        "diagStorage": "[toLower(take(concat('st', parameters('namePrefix'),'log', uniqueString(resourceGroup().id)),24))]",
+        "diagStorageucx": "[toLower(take(concat('st', parameters('namePrefix'),'ucx', uniqueString(resourceGroup().id)),24))]",
+        "hrStorage": "[toLower(take(concat('st', parameters('namePrefix'),'hr', uniqueString(resourceGroup().id)),24))]",
+
+        "kvName": "[concat('kv-', variables('namePrefix'))]",
+        "logAnalyticsName": "[concat('log-',variables('namePrefix'))]",
+        "automationAccountName": "[concat('aa-',variables('namePrefix'))]"
+    },
+    "resources": [
+        {
+            "comments": " diagnostics storage",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "name": "[variables('diagStorage')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "minimumTlsVersion": "TLS1_2"
+            },
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "comments": " diagnostics storage",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "name": "[variables('diagStorageucx')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "minimumTlsVersion": "TLS1_1"
+            },
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "comments": "hr storage",
+             "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "name": "[variables('hrStorage')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "minimumTlsVersion": "TLS1_0",
+                "supportsHttpsTrafficOnly": false,
+                "allowBlobPublicAccess": true,
+                "allowSharedKeyAccess": true
+            },
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "condition": "[equals(parameters('newOrExistingKv'),'new')]",
+            "apiVersion": "2019-09-01",
+            "name": "[variables('kvName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "type": "Microsoft.KeyVault/vaults",
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForDiskEncryption": true,
+                "tenantId": "[parameters('kvTenantId')]",
+                "sku": {
+                    "name": "Standard",
+                    "family": "A"
+                },
+                "accessPolicies": [],
+                "enableSoftDelete": false,
+                "softDeleteRetentionInDays": 90
+
+            },
+            "dependsOn": []
+        },
+        {
+            "apiVersion": "2019-09-01",
+            "name": "[concat(variables('kvName'),'/add')]",
+            "type": "Microsoft.KeyVault/vaults/accessPolicies",
+            "properties": {
+                "accessPolicies": [
+                    {
+                        "tenantId": "[parameters('kvTenantId')]",
+                        "objectId": "[parameters('kvUserId')]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "UnwrapKey",
+                                "WrapKey",
+                                "Verify",
+                                "Sign",
+                                "Decrypt",
+                                "Encrypt",
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore",
+                                "Decrypt",
+                                "Encrypt",
+                                "UnwrapKey",
+                                "WrapKey",
+                                "Verify",
+                                "Sign",
+                                "Purge"
+                            ],
+                            "secrets": [
+                                "get",
+                                "list",
+                                "set",
+                                "delete"
+                            ],
+                            "certificates": [
+                                "Get",
+                                "List",
+                                "Import"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.KeyVault/vaults/', variables('kvName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2020-03-01-preview",
+            "name": "[variables('logAnalyticsName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "sku": {
+                    "name": "pergb2018"
+                },
+                "retentionInDays": "90",
+                "features": {
+                    "searchVersion": 1,
+                    "legacy": 0
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts",
+            "apiVersion": "2015-01-01-preview",
+            "name": "[variables('automationAccountName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "sku": {
+                    "name": "Basic"
+                }
+            },
+            "resources": []
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/providers/diagnosticSettings",
+            "apiVersion": "2015-07-01",
+            "name": "[concat(variables('automationAccountName'), '/', 'Microsoft.Insights/service')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Automation/automationAccounts/', variables('automationAccountName'))]"
+            ],
+            "properties": {
+                "workspaceId": "[resourceId(resourceGroup().name, 'microsoft.operationalinsights/workspaces', variables('logAnalyticsName'))]",
+                "logs": [
+                    {
+                        "category": "JobLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "JobStreams",
+                        "enabled": true
+                    },
+                    {
+                        "category": "DscNodeStatus",
+                        "enabled": true
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
+            "apiVersion": "2020-03-01-preview",
+            "name": "[concat(variables('logAnalyticsName'), '/' , 'Automation')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('logAnalyticsName')]",
+                "[variables('automationAccountName')]"
+            ],
+            "properties": {
+                "resourceId": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+            }
+        }
+    ]
+}
