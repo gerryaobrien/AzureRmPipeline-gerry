@@ -16,13 +16,12 @@ steps:
     azureResourceManagerConnection: 'AzureRmPipeline-conn'
     subscriptionId: '9ce52300-9b2c-4e1c-89e1-35f03e79cca2'
     action: 'Create Or Update Resource Group'
-    resourceGroupName: 'AzureRmPipeline-rg'
-    location: 'West US'
-    templateLocation: 'Linked artifact'
-    csmFile: 'https://raw.githubusercontent.com/gerryaobrien/AzureRmPipeline-gerry/main/CreateWebApp/azuredeploy.json'
-    overrideParameters: '-projectName AzureRmPipeline-gerry'
+    resourceGroupName: 'gerry-rg'
+    location: 'East US'
+    templateLocation: 'URL of the file'
+    csmFileLink: 'https://raw.githubusercontent.com/gerryaobrien/AzureRmPipeline-gerry/main/CreateWebApp/azuredeploy.json?token=GHSAT0AAAAAACALHMJQAJRTTXFTGUDQS6TOZA2FNKA'
     deploymentMode: 'Incremental'
-    deploymentName: 'DeployPipelineTemplate'
+    deploymentName: 'TestzDeploy'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
