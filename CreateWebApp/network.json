@@ -1,0 +1,433 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "namePrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Name prefix for resources"
+            }
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {}
+        },
+        "IPbasePrefix": {
+            "type": "string",
+            "defaultValue": "10.1",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        }
+    },
+    "variables": {
+        "namePrefix": "[concat(parameters('namePrefix'),'-csilab')]",
+
+        "vnetName": "[concat('vnet-',variables('namePrefix') )]",
+        "beSubnetName": "[concat('snet-',variables('namePrefix'), '-be')]",
+        "feSubnetName": "[concat('snet-',variables('namePrefix'), '-fe')]",
+        "clientSubnetName": "[concat('snet-',variables('namePrefix'), '-client')]",
+        "attackSubnetName": "[concat('snet-',variables('namePrefix'), '-attack')]",
+
+        "AzureBastianSubnetName": "AzureBastionSubnet",
+
+        "beSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-be')]",
+        "feSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-fe')]",
+        "clientSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-client')]",
+        "attackSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-attack')]",
+
+        "pfsenseSubnetName": "[concat('snet-',variables('namePrefix'), '-pfsense')]",
+        "pfsenseSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-pfsense')]",
+
+        "agentSubnetName": "[concat('snet-',variables('namePrefix'), '-agent')]",
+        "agentSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-agent')]",
+
+        "agwSubnetName": "[concat('snet-',variables('namePrefix'), '-agw')]",
+        "agwSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-agw')]",
+
+        "dvwaSubnetName": "[concat('snet-',variables('namePrefix'), '-dvwa')]",
+        "dvwaSubnetNsgName": "[concat('nsg-',variables('namePrefix'), '-dvwa')]"
+
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('dvwaSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('agwSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('pfsenseSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('agentSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('beSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('clientSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('feSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('attackSubnetNsgName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Port_Any",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-07-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('vnetName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('beSubnetNsgName'))]",
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('feSubnetNsgName'))]",
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('clientSubnetNsgName'))]",
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('attackSubnetNsgName'))]",
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('pfsenseSubnetNsgName'))]",
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('attackSubnetNsgName'))]",
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('agentSubnetNsgName'))]",
+                "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('dvwaSubnetNsgName'))]"
+            ],
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [ "[concat(parameters('IPbasePrefix'),'.0.0/16')]" ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('AzureBastianSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.1.0/24')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('agentSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.2.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('agentSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('beSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.10.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('beSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('feSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.11.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('feSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('clientSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.12.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('clientSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('attackSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.13.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('attackSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('pfsenseSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.14.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('pfsenseSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('agwSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.15.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('agwSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "[variables('dvwaSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[concat(parameters('IPbasePrefix'),'.16.0/24')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkSecurityGroups', variables('dvwaSubnetNsgName'))]"
+                            },
+                            "serviceEndpoints": [],
+                            "delegations": [
+                                {
+                                    "name": "ACIDelegationService",
+                                    "properties": {
+                                        "serviceName": "Microsoft.ContainerInstance/containerGroups",
+                                        "actions": [
+                                            "Microsoft.Network/virtualNetworks/subnets/action"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
