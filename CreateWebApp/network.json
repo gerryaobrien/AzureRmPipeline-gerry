@@ -11,6 +11,7 @@
         },
         "namePrefix": {
             "type": "string",
+            "defaultValue": "test",
             "metadata": {
                 "description": "Name prefix for resources"
             }
