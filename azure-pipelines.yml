@@ -19,7 +19,7 @@ steps:
     resourceGroupName: 'gerry-rg'
     location: 'East US'
     templateLocation: 'URL of the file'
-    csmFileLink: 'https://raw.githubusercontent.com/gerryaobrien/AzureRmPipeline-gerry/main/CreateWebApp/azuredeploy.json'
+    csmFileLink: 'https://raw.githubusercontent.com/gerryaobrien/AzureRmPipeline-gerry/main/CreateWebApp/network.json'
     overrideParameters: '-projectName gerrytest'
     deploymentMode: 'Incremental'
     deploymentName: 'TestzDeploy'
