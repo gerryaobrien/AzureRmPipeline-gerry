@@ -19,7 +19,7 @@ steps:
     resourceGroupName: 'gerry-rg'
     location: 'East US'
     templateLocation: 'URL of the file'
-    csmFileLink: 'https://github.com/gerryaobrien/AzureRmPipeline-gerry/blob/main/CreateWebApp/common.json'
+    csmFileLink: 'https://github.com/gerryaobrien/AzureRmPipeline-gerry/blob/main/CreateWebApp/paas.json'
     deploymentMode: 'Incremental'
     # deploymentName: 'common values'
     deploymentName: 'TestzDeploy'
