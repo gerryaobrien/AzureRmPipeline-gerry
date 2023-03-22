@@ -3,54 +3,71 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
+            "defaultValue": "westus",
             "type": "string"
         },
         "storageAccountName": {
+            "defaultValue": "storagejc",
             "type": "string"
         },
         "accountType": {
+            "defaultValue": "Standard_RAGRS",
             "type": "string"
         },
         "kind": {
+            "defaultValue": "StorageV2",
             "type": "string"
         },
         "accessTier": {
+            "defaultValue": "Hot",
             "type": "string"
         },
         "minimumTlsVersion": {
+            "defaultValue": "TLS1_0",
             "type": "string"
         },
         "supportsHttpsTrafficOnly": {
+            "defaultValue": "false",
             "type": "bool"
         },
         "allowBlobPublicAccess": {
+            "defaultValue": "true",
             "type": "bool"
         },
         "allowSharedKeyAccess": {
+            "defaultValue": "true",
             "type": "bool"
         },
         "networkAclsBypass": {
+            "defaultValue": "AzureServices",
             "type": "string"
         },
         "networkAclsDefaultAction": {
+            "defaultValue": "Allow",
             "type": "string"
         },
         "isContainerRestoreEnabled": {
+            "defaultValue": "false",
             "type": "bool"
         },
         "isBlobSoftDeleteEnabled": {
+            "defaultValue": "false",
             "type": "bool"
         },
         "isContainerSoftDeleteEnabled": {
+            "defaultValue": "false",
             "type": "bool"
         },
         "changeFeed": {
+            "defaultValue": "false",
             "type": "bool"
         },
         "isVersioningEnabled": {
+            "defaultValue": "false",
             "type": "bool"
         },
         "isShareSoftDeleteEnabled": {
+            "defaultValue": "false",
             "type": "bool"
         }
     },
