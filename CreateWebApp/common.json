@@ -17,7 +17,7 @@
             }
         },
         "kvTenantId": {
-            "defaultValue": "gerrytest",
+            "defaultValue": "f240065f-a5dc-4a8d-8d28-7eae02c790af",
             "type": "string",
             "metadata": {
                 "description": ""
