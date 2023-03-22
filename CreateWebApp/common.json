@@ -17,12 +17,14 @@
             }
         },
         "kvTenantId": {
+            "defaultValue": "gerrytest"
             "type": "string",
             "metadata": {
                 "description": ""
             }
         },
         "kvUserId": {
+            "defaultValue": "gerry"
             "type": "string",
             "metadata": {
                 "description": ""
