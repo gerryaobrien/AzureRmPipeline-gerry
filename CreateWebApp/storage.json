@@ -7,7 +7,7 @@
             "type": "string"
         },
         "storageAccountName": {
-            "defaultValue": "storagejc",
+            "defaultValue": "storagegerryo",
             "type": "string"
         },
         "accountType": {
