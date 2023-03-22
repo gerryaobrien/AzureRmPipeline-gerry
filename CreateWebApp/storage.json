@@ -27,15 +27,15 @@
             "type": "string"
         },
         "supportsHttpsTrafficOnly": {
-            "defaultValue": "false",
+            "defaultValue": false,
             "type": "bool"
         },
         "allowBlobPublicAccess": {
-            "defaultValue": "true",
+            "defaultValue": true,
             "type": "bool"
         },
         "allowSharedKeyAccess": {
-            "defaultValue": "true",
+            "defaultValue": true,
             "type": "bool"
         },
         "networkAclsBypass": {
@@ -47,27 +47,27 @@
             "type": "string"
         },
         "isContainerRestoreEnabled": {
-            "defaultValue": "false",
+            "defaultValue": false,
             "type": "bool"
         },
         "isBlobSoftDeleteEnabled": {
-            "defaultValue": "false",
+            "defaultValue": false,
             "type": "bool"
         },
         "isContainerSoftDeleteEnabled": {
-            "defaultValue": "false",
+            "defaultValue": false,
             "type": "bool"
         },
         "changeFeed": {
-            "defaultValue": "false",
+            "defaultValue": false,
             "type": "bool"
         },
         "isVersioningEnabled": {
-            "defaultValue": "false",
+            "defaultValue": false,
             "type": "bool"
         },
         "isShareSoftDeleteEnabled": {
-            "defaultValue": "false",
+            "defaultValue": false,
             "type": "bool"
         }
     },
