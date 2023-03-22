@@ -10,6 +10,7 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
     deploymentScope: 'Resource Group'
@@ -22,6 +23,18 @@ steps:
     csmFileLink: 'https://raw.githubusercontent.com/gerryaobrien/AzureRmPipeline-gerry/main/CreateWebApp/network.json'
     # overrideParameters: '-projectName gerrytest'
     deploymentMode: 'Incremental'
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'AzureRmPipeline-conn'
+    subscriptionId: '9ce52300-9b2c-4e1c-89e1-35f03e79cca2'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'gerry-rg'
+    location: 'East US'
+    templateLocation: 'URL of the file'
+    csmFileLink: 'https://github.com/gerryaobrien/AzureRmPipeline-gerry/blob/main/CreateWebApp/common.json'
+    deploymentMode: 'Incremental'
+    deploymentName: 'common values'
     deploymentName: 'TestzDeploy'
 
 - script: |
