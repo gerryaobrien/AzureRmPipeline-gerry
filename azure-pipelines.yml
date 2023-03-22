@@ -34,7 +34,7 @@ steps:
     templateLocation: 'URL of the file'
     csmFileLink: 'https://github.com/gerryaobrien/AzureRmPipeline-gerry/blob/main/CreateWebApp/common.json'
     deploymentMode: 'Incremental'
-    deploymentName: 'common values'
+    # deploymentName: 'common values'
     deploymentName: 'TestzDeploy'
 
 - script: |
